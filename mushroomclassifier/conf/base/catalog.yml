@@ -1,0 +1,16 @@
+# Here you can define all your datasets by using simple YAML syntax.
+#
+# Documentation for this file format can be found in "The Data Catalog"
+# Link: https://docs.kedro.org/en/stable/data/data_catalog.html
+mushroom_data:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/mushrooms.csv
+
+preprocessed_data:
+  type: pandas.ParquetDataset
+  filepath: data/03_primary/preprocessed_data.parquet
+
+model:
+  type: pickle.PickleDataset
+  filepath: data/06_models/best_model.pkl
+

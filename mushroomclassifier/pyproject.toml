@@ -1,0 +1,33 @@
+[build-system]
+requires = [ "setuptools",]
+build-backend = "setuptools.build_meta"
+
+[project]
+requires-python = ">=3.9"
+name = "mushroomclassifier"
+readme = "README.md"
+dynamic = [ "version",]
+dependencies = [ "ipython>=8.10", "jupyterlab>=3.0", "notebook", "kedro~=0.19.14",]
+
+[project.scripts]
+mushroomclassifier = "mushroomclassifier.__main__:main"
+
+[tool.kedro]
+package_name = "mushroomclassifier"
+project_name = "MushroomClassifier"
+kedro_init_version = "0.19.14"
+tools = "['Data Structure']"
+example_pipeline = "False"
+source_dir = "src"
+
+[project.entry-points."kedro.hooks"]
+
+[tool.setuptools.dynamic.version]
+attr = "mushroomclassifier.__version__"
+
+[tool.setuptools.packages.find]
+where = [ "src",]
+namespaces = false
+
+[tool.kedro_telemetry]
+project_id = "dd1108805ce24fb885b426fe790f2b47"

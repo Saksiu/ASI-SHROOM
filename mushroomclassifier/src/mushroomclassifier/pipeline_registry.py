@@ -1,16 +1,9 @@
-"""Project pipelines."""
-from __future__ import annotations
-
-from kedro.framework.project import find_pipelines
 from kedro.pipeline import Pipeline
-
+from .pipelines import process_data, train_model  # upewnij się, że to odpowiada nazwom folderów z pipeline'ami
 
 def register_pipelines() -> dict[str, Pipeline]:
-    """Register the project's pipelines.
-
-    Returns:
-        A mapping from pipeline names to ``Pipeline`` objects.
-    """
-    pipelines = find_pipelines()
-    pipelines["__default__"] = sum(pipelines.values())
-    return pipelines
+    return {
+        "preprocessing": process_data.create_pipeline(),
+        "training": train_model.create_pipeline(),
+        "__default__": train_model.create_pipeline() + train_model.create_pipeline(),
+    }

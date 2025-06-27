@@ -2,6 +2,8 @@
 
 [![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
 
+You need to put mushrooms.csv from here https://www.kaggle.com/datasets/uciml/mushroom-classification?resource=download to mushroomclassifier/data/01_raw
+
 ## Overview
 
 This is your new Kedro project, which was generated using `kedro 0.19.14`.

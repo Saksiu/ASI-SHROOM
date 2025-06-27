@@ -2,54 +2,94 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# Load model and preprocessor
+# ----------------------
+# Mapowania cech (ludzkie opisy <-> kody literowe)
+# ----------------------
+feature_maps = {
+    "cap-shape": {
+        "b": "stożkowy", "c": "wypukły", "x": "wypukło-płaski", "f": "płaski", "k": "guzkowaty", "s": "wduszony"
+    },
+    "cap-surface": {
+        "f": "włóknista", "g": "rowkowana", "y": "łuskowata", "s": "gładka"
+    },
+    "cap-color": {
+        "n": "brązowy", "b": "buff", "c": "cynamonowy", "g": "szary", "r": "zielony", "p": "różowy", "u": "fioletowy", "e": "czerwony", "w": "biały", "y": "żółty"
+    },
+    "bruises": {
+        "t": "tak", "f": "nie"
+    },
+    "odor": {
+        "a": "migdałowy", "l": "anizowy", "c": "creozot", "y": "rybi", "f": "nieprzyjemny", "m": "stęchły", "n": "brak", "p": "ostry", "s": "korzenny"
+    },
+    "gill-attachment": {
+        "a": "wolne", "d": "przyczepione"
+    },
+    "gill-spacing": {
+        "c": "blisko", "w": "szeroko"
+    },
+    "gill-size": {
+        "b": "szerokie", "n": "wąskie"
+    },
+    "gill-color": {
+        "k": "czarny", "n": "brązowy", "b": "buff", "h": "czekoladowy", "g": "szary", "r": "zielony", "o": "pomarańczowy", "p": "różowy", "u": "fioletowy", "e": "czerwony", "w": "biały", "y": "żółty"
+    },
+    "stalk-shape": {
+        "e": "poszerzający się", "t": "zwężający się"
+    },
+    "stalk-root": {
+        "b": "bulwa", "c": "maczugowaty", "u": "bez podstawy", "e": "równy", "?": "brak danych"
+    },
+    "stalk-surface-above-ring": {
+        "f": "włóknista", "y": "łuskowata", "k": "jedwabista", "s": "gładka"
+    },
+    "stalk-surface-below-ring": {
+        "f": "włóknista", "y": "łuskowata", "k": "jedwabista", "s": "gładka"
+    },
+    "stalk-color-above-ring": {
+        "n": "brązowy", "b": "buff", "c": "cynamonowy", "g": "szary", "o": "pomarańczowy", "p": "różowy", "e": "czerwony", "w": "biały", "y": "żółty"
+    },
+    "stalk-color-below-ring": {
+        "n": "brązowy", "b": "buff", "c": "cynamonowy", "g": "szary", "o": "pomarańczowy", "p": "różowy", "e": "czerwony", "w": "biały", "y": "żółty"
+    },
+    "veil-type": {
+        "p": "częściowy"
+    },
+    "veil-color": {
+        "n": "brązowy", "o": "pomarańczowy", "w": "biały", "y": "żółty"
+    },
+    "ring-number": {
+        "n": "brak", "o": "jeden", "t": "dwa"
+    },
+    "ring-type": {
+        "c": "zwężający się", "e": "rozszerzający się", "f": "flarowaty", "l": "duży", "n": "brak", "p": "wiszący", "s": "powierzchniowy", "z": "na zewnątrz"
+    },
+    "spore-print-color": {
+        "k": "czarny", "n": "brązowy", "b": "buff", "h": "czekoladowy", "r": "zielony", "o": "pomarańczowy", "u": "fioletowy", "w": "biały", "y": "żółty"
+    },
+    "population": {
+        "a": "abundant", "c": "clustery", "n": "numerous", "s": "scattered", "v": "several", "y": "solitary"
+    },
+    "habitat": {
+        "g": "trawa", "l": "łąka", "m": "moczary", "p": "ścieżka", "u": "miejski", "w": "las", "d": "odpady"
+    }
+}
+
 model = joblib.load("data/06_models/best_model.pkl")
 preprocessor = joblib.load("data/06_models/preprocessor.pkl")
 
-# Cecha: kolumny danych (bez "class")
-FEATURES = [
-    'cap-shape', 'cap-surface', 'cap-color', 'bruises', 'odor',
-    'gill-attachment', 'gill-spacing', 'gill-size', 'gill-color',
-    'stalk-shape', 'stalk-root', 'stalk-surface-above-ring',
-    'stalk-surface-below-ring', 'stalk-color-above-ring',
-    'stalk-color-below-ring', 'veil-color', 'ring-number',
-    'ring-type', 'spore-print-color', 'population', 'habitat'
-]
+st.title("🌳 Klasyfikator grzybów")
+st.markdown("Wybierz cechy grzyba, a model oceni, czy jest **jadalny** czy **trujący**.")
 
-# Przykładowe możliwe wartości (można je automatycznie wyciągnąć z danych)
-OPTIONS = {
-    'cap-shape': ['b', 'c', 'x', 'f', 'k', 's'],
-    'cap-surface': ['f', 'g', 'y', 's'],
-    'cap-color': ['n', 'b', 'c', 'g', 'r', 'p', 'u', 'e', 'w', 'y'],
-    'bruises': ['t', 'f'],
-    'odor': ['a', 'l', 'c', 'y', 'f', 'm', 'n', 'p', 's'],
-    'gill-attachment': ['a', 'd', 'f', 'n'],
-    'gill-spacing': ['c', 'w', 'd'],
-    'gill-size': ['b', 'n'],
-    'gill-color': ['k', 'n', 'b', 'h', 'g', 'r', 'o', 'p', 'u', 'e', 'w', 'y'],
-    'stalk-shape': ['e', 't'],
-    'stalk-root': ['b', 'c', 'u', 'e', 'z', 'r', '?'],
-    'stalk-surface-above-ring': ['f', 'y', 'k', 's'],
-    'stalk-surface-below-ring': ['f', 'y', 'k', 's'],
-    'stalk-color-above-ring': ['n', 'b', 'c', 'g', 'o', 'p', 'e', 'w', 'y'],
-    'stalk-color-below-ring': ['n', 'b', 'c', 'g', 'o', 'p', 'e', 'w', 'y'],
-    'veil-color': ['n', 'o', 'w', 'y'],
-    'ring-number': ['n', 'o', 't'],
-    'ring-type': ['c', 'e', 'f', 'l', 'n', 'p', 's', 'z'],
-    'spore-print-color': ['k', 'n', 'b', 'h', 'r', 'o', 'u', 'w', 'y'],
-    'population': ['a', 'c', 'n', 's', 'v', 'y'],
-    'habitat': ['g', 'l', 'm', 'p', 'u', 'w', 'd']
-}
+inputs = {}
 
-st.title("🍄 Klasyfikator grzybów – Jadalny czy Trujący?")
-st.markdown("Wprowadź cechy grzyba, a model spróbuje przewidzieć, czy jest jadalny (`e`) czy trujący (`p`).")
+with st.form("grzyb_form"):
+    for feature, value_map in feature_maps.items():
+        label = feature.replace("-", " ").capitalize()
+        reverse_map = {v: k for k, v in value_map.items()}
+        selection = st.selectbox(label, list(value_map.values()), key=feature)
+        inputs[feature] = reverse_map[selection]
 
-# Formularz cech
-with st.form("mushroom_form"):
-    inputs = {}
-    for feature in FEATURES:
-        inputs[feature] = st.selectbox(feature, OPTIONS[feature])
-    submitted = st.form_submit_button("Sprawdź jadalność")
+    submitted = st.form_submit_button("Sprawdź")
 
 if submitted:
     input_df = pd.DataFrame([inputs])
@@ -57,5 +97,5 @@ if submitted:
     prediction = model.predict(transformed)[0]
     label = "JADALNY 🍽️" if prediction == 'e' else "TRUJĄCY ☠️"
 
-    st.subheader("📢 Wynik predykcji:")
-    st.success(f"Grzyb jest: **{label}** (klasa `{prediction}`)")
+    st.markdown("### Wynik:")
+    st.success(label)

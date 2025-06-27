@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import joblib
+from pycaret.classification import load_model, predict_model
 
 # ----------------------
 # Mapowania cech (ludzkie opisy <-> kody literowe)
@@ -74,8 +74,7 @@ feature_maps = {
     }
 }
 
-model = joblib.load("data/06_models/best_model.pkl")
-preprocessor = joblib.load("data/06_models/preprocessor.pkl")
+model = load_model("data/06_models/best_model")
 
 st.title("🌳 Klasyfikator grzybów")
 st.markdown("Wybierz cechy grzyba, a model oceni, czy jest **jadalny** czy **trujący**.")
@@ -93,8 +92,8 @@ with st.form("grzyb_form"):
 
 if submitted:
     input_df = pd.DataFrame([inputs])
-    transformed = preprocessor.transform(input_df)
-    prediction = model.predict(transformed)[0]
+    result = predict_model(model, data=input_df)
+    prediction = result.loc[0, 'prediction_label']
     label = "JADALNY 🍽️" if prediction == 'e' else "TRUJĄCY ☠️"
 
     st.markdown("### Wynik:")

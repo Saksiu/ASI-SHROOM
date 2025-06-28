@@ -74,7 +74,7 @@ feature_maps = {
     }
 }
 
-model = load_model("data/06_models/best_model")
+model = load_model("../data/06_models/best_model")
 
 st.title("🌳 Klasyfikator grzybów")
 st.markdown("Wybierz cechy grzyba, a model oceni, czy jest **jadalny** czy **trujący**.")
